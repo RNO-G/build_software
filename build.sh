@@ -1,3 +1,4 @@
+
 #!/bin/bash
 set -euo pipefail
 
@@ -7,7 +8,7 @@ ENV_NAME="cvmfs_env"                        # Spack environment name
 YAML_SOURCE="./spack_rhel8.yaml"            # Your existing spack.yaml
 WORKDIR="/tmp/spack-runtime-rhel8"          # Scratch space for build/install
 VIEWDIR="$WORKDIR/view"                     # Final runtime view for CVMFS export
-NPROC=10                                    # Number of parallel jobs for build
+NPROC=10                                     # Number of parallel jobs for build
 
 # ==== STEP 1: Clone Spack if Needed ====
 if [ ! -d "$SPACK_DIR" ]; then
@@ -16,10 +17,18 @@ if [ ! -d "$SPACK_DIR" ]; then
 fi
 source "$SPACK_DIR/share/spack/setup-env.sh"
 
+# ==== Ensure Spack Public Mirror is Available ====
+if ! spack mirror list | grep -q spack-public; then
+    echo "[+] Adding official Spack binary mirror..."
+    spack mirror add spack-public https://binaries.spack.io/develop/build_cache
+    spack buildcache keys --install --trust
+fi
+
 # ==== STEP 2: Build Compiler First ====
-echo "[+] Bootstrapping compiler..."
-if ! spack spec gcc@15.1 &>/dev/null; then
-    spack install gcc@15.1 ^gcc@builtin
+echo "[+] Bootstrapping compiler (gcc@15.1.0)..."
+if ! spack compilers | grep -q gcc@15.1.0; then
+    spack install -j "$NPROC" gcc@15.1.0
+    spack compiler find "$(spack location -i gcc@15.1.0)"
 fi
 
 # ==== STEP 3: Create and Activate Environment ====
@@ -30,6 +39,6 @@ spack env create "$ENV_NAME" "$WORKDIR/$ENV_NAME/spack.yaml"
 spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Install All Packages ====
-echo "[+] Concretizing and installing packages..."
+echo "[+] Concretizing and installing packages with GCC@15.1.0..."
 spack concretize --fresh
 spack install -j "$NPROC"
