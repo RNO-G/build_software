@@ -1,8 +1,0 @@
-spack:
-  view: false
-
-  concretizer:
-    unify: when_possible
-
-  specs:
-    - gsl@2.8
