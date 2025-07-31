@@ -4,7 +4,7 @@ spack:
     - cmake@4.0.3
     - fftw@3.3.10
     - gsl@2.8
-    - python@3.13.5
+    - python@3.13.5 +ssl +shared +zlib +readline
     - py-pip
     # - root +python +gsl +mathmore
   concretizer:
