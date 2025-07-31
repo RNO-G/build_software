@@ -6,6 +6,7 @@ spack:
     - gsl@2.8
     - python@3.13.5
     - py-pip
+    # - root +python +gsl +mathmore
   concretizer:
     unify: true
   packages:

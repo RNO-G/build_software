@@ -14,7 +14,7 @@ SPACK_VERSION="v1.0.0"
 
 # ==== Derived Paths ====
 SPACK_DIR="${TOPDIR}/spack_internals/spack_${OS_TAG}_${SPACK_VERSION}"
-ENV_NAME="cvmfs_env_${OS_TAG}"
+ENV_NAME="${OS_TAG}"
 YAML_SOURCE="./${OS_TAG}.yaml"
 VIEWDIR="${TOPDIR}/${OS_TAG}"
 NPROC=32
