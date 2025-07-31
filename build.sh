@@ -3,28 +3,30 @@ set -euo pipefail
 
 # ==== ARGUMENTS ====
 if [ $# -ne 2 ]; then
-    echo "Usage: $0 <os_tag> <viewdir>"
-    echo "Example: $0 el9 /cvmfs/myorg/software/el9/view"
+    echo "Usage: $0 <os_tag> <topdir>"
+    echo "Example: $0 el9 /cvmfs/myorg/software"
     exit 1
 fi
 
 OS_TAG="$1"
-VIEWDIR="$2"
+TOPDIR="$2"
+SPACK_VERSION="v1.0.0"
 
-# ==== CONFIGURATION ====
-SPACK_DIR="$PWD/spack"                      # Location to clone Spack
-SPACK_VERSION="v1.0.0"                      # Pinned Spack release
-ENV_NAME="${OS_TAG}"                        # Unique environment per OS
-YAML_SOURCE="./${OS_TAG}.yaml"              # OS-specific spack.yaml
-NPROC=32                                    # Number of parallel jobs
+# ==== Derived Paths ====
+SPACK_DIR="${TOPDIR}/spack_internals/spack_${OS_TAG}_${SPACK_VERSION}"
+ENV_NAME="cvmfs_env_${OS_TAG}"
+YAML_SOURCE="./${OS_TAG}.yaml"
+VIEWDIR="${TOPDIR}/${OS_TAG}"
 
 echo "[+] Using OS tag:     $OS_TAG"
+echo "[+] Using TOPDIR:     $TOPDIR"
 echo "[+] Using VIEWDIR:    $VIEWDIR"
-echo "[+] Using YAML file:  $YAML_SOURCE"
+echo "[+] Using SPACK DIR:  $SPACK_DIR"
 
 # ==== STEP 1: Clone Spack if Needed ====
 if [ ! -d "$SPACK_DIR" ]; then
-    echo "[+] Cloning Spack..."
+    echo "[+] Cloning Spack into $SPACK_DIR..."
+    mkdir -p "$(dirname "$SPACK_DIR")"
     git clone --depth=1 --branch "$SPACK_VERSION" https://github.com/spack/spack.git "$SPACK_DIR"
 fi
 source "$SPACK_DIR/share/spack/setup-env.sh"
@@ -60,7 +62,6 @@ pip3 install gnureadline h5py healpy \
 
 # ==== STEP 6: Create Setup Script ====
 echo "[+] Creating setup script..."
-
 PYVER=$("$VIEWDIR/bin/python3" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 SETUP_SCRIPT="$VIEWDIR/setup_${OS_TAG}.sh"
 
