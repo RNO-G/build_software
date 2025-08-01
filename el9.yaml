@@ -6,7 +6,29 @@ spack:
     - gsl@2.8
     - python@3.13.5 +ssl +shared +zlib
     - py-pip
+    - py-numpy
+    - py-scipy
+    - py-matplotlib
+    - py-pandas
+    - py-h5py
+    - py-healpy
+    - py-astropy
+    - py-iminuit
+    - py-tqdm
+    - py-uproot
+    - py-awkward
+    - py-pybind11
+    - py-tables
+    - py-tinydb
+    - py-aenum
+    - py-pymongo
+    - py-dash
+    - py-plotly
+    - py-toml
+    - py-configparser
+    - py-filelock
     - root@6.36.02 +python +gsl +tmva +roofit +http
+    - librno-g@main
   concretizer:
     unify: true
   packages:

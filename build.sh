@@ -50,16 +50,12 @@ spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Concretize and Install Full Stack ====
 echo "[+] Installing full environment..."
+spack repo add "./spack_packages"
 spack concretize --fresh --reuse
 spack install -j "$NPROC"
 
 # ==== STEP 5: Install Python Needs ====
-python3 -m pip install --upgrade pip
-pip3 install gnureadline h5py healpy \
-    iminuit tables tqdm matplotlib numpy pandas pynverse astropy \
-    scipy pybind11 uproot awkward \
-    tinydb tinydb-serialization aenum pymongo dash plotly \
-    toml peakutils configparser filelock "pybind11[global]"
+pipe install pynverse peakutils
 
 # ==== STEP 6: Create Setup Script ====
 echo "[+] Creating setup script..."
