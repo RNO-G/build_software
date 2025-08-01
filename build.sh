@@ -57,7 +57,7 @@ spack install -j "$NPROC"
 python3 -m pip install --upgrade pip
 pip3 install gnureadline h5py healpy \
     iminuit tables tqdm matplotlib numpy pandas pynverse astropy \
-    scipy pybind11 dataclasses uproot awkward \
+    scipy pybind11 uproot awkward \
     tinydb tinydb-serialization aenum pymongo dash plotly \
     toml peakutils configparser filelock "pybind11[global]"
 

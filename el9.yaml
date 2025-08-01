@@ -4,9 +4,9 @@ spack:
     - cmake@4.0.3
     - fftw@3.3.10
     - gsl@2.8
-    - python@3.13.5 +ssl +shared +zlib +readline
+    - python@3.13.5 +ssl +shared +zlib
     - py-pip
-    # - root +python +gsl +mathmore
+    - root@6.36.02 +python +gsl
   concretizer:
     unify: true
   packages:
