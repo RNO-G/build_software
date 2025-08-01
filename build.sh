@@ -72,6 +72,10 @@ export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
 export PATH="\$MYPROJ_ROOT/bin:\$PATH"
 export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib:\$MYPROJ_ROOT/lib64:\$LD_LIBRARY_PATH"
 export PYTHONPATH="\$MYPROJ_ROOT/lib/python$PYVER/site-packages:\$PYTHONPATH"
+# Source ROOT's environment setup script
+if [ -f "\$MYPROJ_ROOT/bin/thisroot.sh" ]; then
+    source "\$MYPROJ_ROOT/bin/thisroot.sh"
+fi
 EOS
 
 chmod +x "$SETUP_SCRIPT"
