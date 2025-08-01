@@ -6,7 +6,7 @@ spack:
     - gsl@2.8
     - python@3.13.5 +ssl +shared +zlib
     - py-pip
-    - root@6.36.02 +python +gsl
+    - root@6.36.02 +python +gsl +tmva +roofit +http
   concretizer:
     unify: true
   packages:
