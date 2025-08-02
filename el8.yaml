@@ -13,4 +13,7 @@ spack:
     - mattak@main
   concretizer:
     unify: true
-  packa
+  packages:
+    all:
+      prefer:
+        - "gcc@15.1.0"
