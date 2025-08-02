@@ -49,12 +49,15 @@ spack env create "$ENV_NAME" "$YAML_SOURCE" --with-view "$VIEWDIR"
 spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Concretize and Install Full Stack ====
-echo "[+] Installing full environment..."
+echo "[+] Adding custom repo..."
 spack repo add "./spack_packages"
+echo "[+] Starting concretization..."
 spack concretize --fresh --reuse
+echo "[+] Concretization finished. Starting installation..."
 spack install -j "$NPROC"
 
 # ==== STEP 5: Install Python Needs ====
+echo "[+] Installing final pip packages..."
 pipe install pynverse peakutils
 
 # ==== STEP 6: Create Setup Script ====

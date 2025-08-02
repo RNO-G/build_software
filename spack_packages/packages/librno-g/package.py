@@ -6,7 +6,7 @@ class LibrnoG(MakefilePackage):
     homepage = "https://github.com/RNO-G/librno-g"
     git      = "https://github.com/RNO-G/librno-g.git"
 
-    version('main', branch='main')
+    version('master', branch='master')
 
     depends_on('zlib')
     depends_on('py-pybind11', type='build')
