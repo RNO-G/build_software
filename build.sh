@@ -58,7 +58,12 @@ spack install -j "$NPROC"
 
 # ==== STEP 5: Install Python Needs ====
 echo "[+] Installing final pip packages..."
-pipe install pynverse peakutils
+python3 -m pip install --upgrade pip
+pip3 install gnureadline h5py healpy \
+    iminuit tables tqdm matplotlib numpy pandas pynverse astropy \
+    scipy uproot awkward \
+    tinydb tinydb-serialization aenum pymongo dash plotly \
+    toml peakutils configparser filelock
 
 # ==== STEP 6: Create Setup Script ====
 echo "[+] Creating setup script..."
