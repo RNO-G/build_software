@@ -1,7 +1,7 @@
 from spack.package import *
 import os
 
-class Mattak(CMakePackage):
+class Mattak(MakefilePackage):
     """C++ library used by the RNO-G experiment."""
 
     homepage = "https://github.com/RNO-G/mattak"
