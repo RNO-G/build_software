@@ -6,10 +6,11 @@ spack:
     - gsl@2.8
     - python@3.13.5 +ssl +shared +zlib
     - py-pip
+    - py-pybind11
+    - xz@5.6.3
     - root@6.36.02 +python +gsl +tmva +roofit +http
+    - librno-g@master
+    - mattak@main
   concretizer:
     unify: true
-  packages:
-    all:
-      prefer:
-        - "gcc@15.1.0"
+  packa
