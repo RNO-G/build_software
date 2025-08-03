@@ -1,5 +1,6 @@
 from spack.package import *
 import os
+import shutil
 
 class Mattak(MakefilePackage):
     """C++ library used by the RNO-G experiment."""
@@ -8,25 +9,27 @@ class Mattak(MakefilePackage):
     git      = "https://github.com/RNO-G/mattak.git"
 
     version('main', branch="main")
+    depends_on('gmake', type='build')  # Pull in compiler support
 
-    depends_on('cmake', type='build')
+    def build(self, spec, prefix):
+        os.environ['RNO_G_INSTALL_DIR'] = str(prefix)
+        os.environ['CMAKE_FLAGS'] = '-DLIBRNO_G_SUPPORT=ON'
+        cc  = os.environ.get('SPACK_CC', shutil.which('gcc'))
+        cxx = os.environ.get('SPACK_CXX', shutil.which('g++'))
+        os.environ['CC'] = cc
+        os.environ['CXX'] = cxx
+
+        print(f"Building with CC={os.environ['CC']}, CXX={os.environ['CXX']}")
+        make()
 
     def install(self, spec, prefix):
+        # Same env may still be needed here
         os.environ['RNO_G_INSTALL_DIR'] = str(prefix)
-        os.environ['CC'] = spack_cc
-        os.environ['CXX'] = spack_cxx
         os.environ['CMAKE_FLAGS'] = '-DLIBRNO_G_SUPPORT=ON'
+        cc  = os.environ.get('SPACK_CC', shutil.which('gcc'))
+        cxx = os.environ.get('SPACK_CXX', shutil.which('g++'))
+        os.environ['CC'] = cc
+        os.environ['CXX'] = cxx
 
         print(f"Installing to prefix: {prefix}")
-        print(f"Using CC: {os.environ['CC']}")
-        print(f"Using CXX: {os.environ['CXX']}")
-
-        # args = self.std_cmake_args + [
-        #     f'-DCMAKE_INSTALL_PREFIX={prefix}',
-        #     f'-DCMAKE_C_COMPILER={spack_cc}',
-        #     f'-DCMAKE_CXX_COMPILER={spack_cxx}',
-        #     '-DLIBRNO_G_SUPPORT=ON'
-        # ]
-        # cmake('.', *args)
-        make()
         make('install')
