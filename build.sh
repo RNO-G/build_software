@@ -13,7 +13,7 @@ TOPDIR="$2"
 SPACK_VERSION="v1.0.0"
 
 # ==== Derived Paths ====
-SPACK_DIR="${TOPDIR}/spack_internals/spack_${OS_TAG}_${SPACK_VERSION}"
+SPACK_DIR="${TOPDIR}/.spack_internals/spack_${OS_TAG}_${SPACK_VERSION}"
 ENV_NAME="${OS_TAG}"
 YAML_SOURCE="./${OS_TAG}.yaml"
 VIEWDIR="${TOPDIR}/${OS_TAG}"
@@ -68,11 +68,11 @@ pip3 install gnureadline h5py healpy \
 # ==== STEP 6: Create Setup Script ====
 echo "[+] Creating setup script..."
 PYVER=$("$VIEWDIR/bin/python3" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-SETUP_SCRIPT="$VIEWDIR/setup_${OS_TAG}.sh"
+SETUP_SCRIPT="$TOPDIR/setup_${OS_TAG}.sh"
 
 cat > "$SETUP_SCRIPT" <<EOS
 #!/bin/bash
-export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
+export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
 export PATH="\$MYPROJ_ROOT/bin:\$PATH"
 export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib:\$MYPROJ_ROOT/lib64:\$LD_LIBRARY_PATH"
 export PYTHONPATH="\$MYPROJ_ROOT/lib/python$PYVER/site-packages:\$PYTHONPATH"
