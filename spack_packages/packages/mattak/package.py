@@ -10,6 +10,8 @@ class Mattak(MakefilePackage):
 
     version('main', branch="main")
     depends_on('gmake', type='build')  # Pull in compiler support
+    depends_on('cmake', type='build')
+    depends_on('root')
 
     def build(self, spec, prefix):
         os.environ['RNO_G_INSTALL_DIR'] = str(prefix)
