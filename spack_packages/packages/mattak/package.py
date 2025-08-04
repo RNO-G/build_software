@@ -12,6 +12,21 @@ class Mattak(MakefilePackage):
     depends_on('gmake', type='build')  # Pull in compiler support
     depends_on('cmake', type='build')
     depends_on('root')
+    depends_on('py-pybind11')
+    
+    def setup_build_environment(self, env):
+        pybind11_prefix = self.spec['py-pybind11'].prefix
+        pyver = self.spec['python'].version.up_to(2)
+        pybind11_dir = os.path.join(
+            pybind11_prefix.lib,
+            f'python{pyver}',
+            'site-packages',
+            'pybind11',
+            'share',
+            'cmake',
+            'pybind11'
+        )
+        env.set('CMAKE_ARGS', f'-Dpybind11_DIR={pybind11_dir}')
 
     def build(self, spec, prefix):
         os.environ['RNO_G_INSTALL_DIR'] = str(prefix)
