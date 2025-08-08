@@ -34,13 +34,13 @@ source "$SPACK_DIR/share/spack/setup-env.sh"
 
 # ==== STEP 2: Upgrade GCC first ====
 spack compiler add # find the compilers we have so far
-echo "[+] Bootstrapping gcc@15.1.0..."
-if ! spack compilers | grep -q gcc@15.1.0; then
+echo "[+] Bootstrapping gcc@15.2.0..."
+if ! spack compilers | grep -q gcc@15.2.0; then
     # install the compiler we want, and force rebuild binutils
     # along with telling it to ignore any fancy optimizations
     # that might not be available globally
-    spack install --add -j "$NPROC" gcc@15.1.0 +binutils ^zlib-ng~opt
-    spack compiler find $(spack location -i gcc@15.1.0)
+    spack install --add -j "$NPROC" gcc@15.2.0 +binutils ^zlib-ng~opt
+    spack compiler find $(spack location -i gcc@15.2.0)
 fi
 
 # ==== STEP 3: Create Environment (with view), and activate ====
