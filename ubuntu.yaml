@@ -17,4 +17,4 @@ spack:
   packages:
     all:
       prefer:
-        - "gcc@15.1.0"
+        - "gcc@15.2.0"
