@@ -28,6 +28,16 @@ class Mattak(MakefilePackage):
         )
         env.set('CMAKE_ARGS', f'-Dpybind11_DIR={pybind11_dir}')
 
+        # also set the PYTHON_SITE_PACAKGES for mattak
+        python_exe = self.spec['python'].command.path
+        target_site = os.popen(
+            f"{python_exe} -c 'import site; print(site.getsitepackages()[0])'"
+        ).read().strip()
+
+        # Set in Spack's build env (propagates to build/install)
+        env.set("PYTHON_SITE_PACKAGES", target_site)
+        os.environ["PYTHON_SITE_PACKAGES"] = target_site
+
     def build(self, spec, prefix):
         os.environ['RNO_G_INSTALL_DIR'] = str(prefix)
         os.environ['CMAKE_FLAGS'] = '-DLIBRNO_G_SUPPORT=ON'
@@ -35,6 +45,15 @@ class Mattak(MakefilePackage):
         cxx = os.environ.get('SPACK_CXX', shutil.which('g++'))
         os.environ['CC'] = cc
         os.environ['CXX'] = cxx
+
+        python_exe = self.spec['python'].command.path
+        target_site = os.popen(
+            f"{python_exe} -c 'import site; print(site.getsitepackages()[0])'"
+        ).read().strip()
+
+        # Set in Spack's build env (propagates to build/install)
+        env.set("PYTHON_SITE_PACKAGES", target_site)
+        os.environ["PYTHON_SITE_PACKAGES"] = target_site
 
         print(f"Building with CC={os.environ['CC']}, CXX={os.environ['CXX']}")
         make()
@@ -47,6 +66,15 @@ class Mattak(MakefilePackage):
         cxx = os.environ.get('SPACK_CXX', shutil.which('g++'))
         os.environ['CC'] = cc
         os.environ['CXX'] = cxx
+
+        python_exe = self.spec['python'].command.path
+        target_site = os.popen(
+            f"{python_exe} -c 'import site; print(site.getsitepackages()[0])'"
+        ).read().strip()
+
+        # Set in Spack's build env (propagates to build/install)
+        env.set("PYTHON_SITE_PACKAGES", target_site)
+        os.environ["PYTHON_SITE_PACKAGES"] = target_site
 
         print(f"Installing to prefix: {prefix}")
         make('install')
