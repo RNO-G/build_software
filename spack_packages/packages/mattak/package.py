@@ -52,7 +52,6 @@ class Mattak(MakefilePackage):
         ).read().strip()
 
         # Set in Spack's build env (propagates to build/install)
-        env.set("PYTHON_SITE_PACKAGES", target_site)
         os.environ["PYTHON_SITE_PACKAGES"] = target_site
 
         print(f"Building with CC={os.environ['CC']}, CXX={os.environ['CXX']}")
@@ -73,7 +72,6 @@ class Mattak(MakefilePackage):
         ).read().strip()
 
         # Set in Spack's build env (propagates to build/install)
-        env.set("PYTHON_SITE_PACKAGES", target_site)
         os.environ["PYTHON_SITE_PACKAGES"] = target_site
 
         print(f"Installing to prefix: {prefix}")
