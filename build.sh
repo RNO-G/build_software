@@ -10,7 +10,7 @@ fi
 
 OS_TAG="$1"
 TOPDIR="$2"
-SPACK_VERSION="v1.0.0"
+SPACK_VERSION="v1.0.1"
 
 # ==== Derived Paths ====
 SPACK_DIR="${TOPDIR}/.spack_internals/spack_${OS_TAG}_${SPACK_VERSION}"
