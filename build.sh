@@ -71,7 +71,8 @@ PYVER=$("$VIEWDIR/bin/python3" -c "import sys; print(f'{sys.version_info.major}.
 SETUP_SCRIPT="$TOPDIR/setup_${OS_TAG}.sh"
 
 cat > "$SETUP_SCRIPT" <<EOS
-#!/bin/bashexport MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
+#!/bin/bash
+export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
 
 # Executables from the view
 export PATH="\$MYPROJ_ROOT/bin:\$PATH"                                                                                  
