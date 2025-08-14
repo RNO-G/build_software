@@ -61,7 +61,7 @@ echo "[+] Installing final pip packages..."
 python3 -m pip install --upgrade pip
 pip3 install gnureadline h5py healpy \
     iminuit tables tqdm matplotlib numpy pandas pynverse astropy \
-    scipy uproot awkward \
+    scipy uproot awkward libconf \
     tinydb tinydb-serialization aenum pymongo dash plotly \
     toml peakutils configparser filelock
 
@@ -71,16 +71,32 @@ PYVER=$("$VIEWDIR/bin/python3" -c "import sys; print(f'{sys.version_info.major}.
 SETUP_SCRIPT="$TOPDIR/setup_${OS_TAG}.sh"
 
 cat > "$SETUP_SCRIPT" <<EOS
-#!/bin/bash
-export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
-export PATH="\$MYPROJ_ROOT/bin:\$PATH"
-export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib:\$MYPROJ_ROOT/lib64:\$LD_LIBRARY_PATH"
-export PYTHONPATH="\$MYPROJ_ROOT/lib/python$PYVER/site-packages:\$PYTHONPATH"
+#!/bin/bashexport MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
+
+# Executables from the view
+export PATH="\$MYPROJ_ROOT/bin:\$PATH"                                                                                  
+
+# Let CMake discover ROOT and friends from the view
+export CMAKE_PREFIX_PATH="\$MYPROJ_ROOT\${CMAKE_PREFIX_PATH:+:\$CMAKE_PREFIX_PATH}"
+
+# Optional convenience vars some scripts still look for
+export ROOTSYS="\$MYPROJ_ROOT"
 export GSLDIR="\$MYPROJ_ROOT"
-# Source ROOT's environment setup script
-if [ -f "\$MYPROJ_ROOT/bin/thisroot.sh" ]; then
-    source "\$MYPROJ_ROOT/bin/thisroot.sh"
-fi
+
+# Python modules installed into the view
+export PYTHONPATH="\$MYPROJ_ROOT/lib/python$PYVER/site-packages\${PYTHONPATH:+:\$PYTHONPATH}"
+
+# PyROOT modules (what thisroot.sh would add, but via the view)
+for d in "\$MYPROJ_ROOT/lib/root" "\$MYPROJ_ROOT/lib64/root"; do
+  if [ -d "\$d" ]; then
+    case ":\$PYTHONPATH:" in
+      *:"\$d":*) : ;;  # already present
+      *) export PYTHONPATH="\$d\${PYTHONPATH:+:\$PYTHONPATH}";;
+    esac
+  fi
+done
+
+export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib:\$MYPROJ_ROOT/lib64\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}"
 EOS
 
 chmod +x "$SETUP_SCRIPT"
