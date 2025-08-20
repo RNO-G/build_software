@@ -75,10 +75,13 @@ cat > "$SETUP_SCRIPT" <<EOS
 export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
 
 # Executables from the view
-export PATH="\$MYPROJ_ROOT/bin:\$PATH"                                                                                  
+export PATH="\$MYPROJ_ROOT/bin:\$PATH"
 
-# Let CMake discover ROOT and friends from the view
+# Some exports for CMake
 export CMAKE_PREFIX_PATH="\$MYPROJ_ROOT\${CMAKE_PREFIX_PATH:+:\$CMAKE_PREFIX_PATH}"
+export CC="\$MYPROJ_ROOT/bin/gcc"
+export CXX="\$MYPROJ_ROOT/bin/g++"
+export FC="\$MYPROJ_ROOT/bin/gfortran"
 
 # Optional convenience vars some scripts still look for
 export ROOTSYS="\$MYPROJ_ROOT"
