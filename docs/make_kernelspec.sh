@@ -47,4 +47,11 @@ EOF
 
 echo "✅ Kernelspec written: $KJSON"
 echo "   Display: $DISPLAY_NAME"
+
+# --- also copy to user kernelspec dir (~/.local/share/jupyter/kernels) ---
+USER_KDIR="$HOME/.local/share/jupyter/kernels/$KERNEL_NAME"
+mkdir -p "$USER_KDIR"
+cp "$KJSON" "$USER_KDIR/kernel.json"
+echo "✅ Kernelspec also installed to: $USER_KDIR/kernel.json"
+
 echo "→ In VS Code: Select Kernel → Jupyter Kernels → $DISPLAY_NAME"
