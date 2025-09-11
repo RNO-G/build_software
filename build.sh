@@ -72,7 +72,8 @@ SETUP_SCRIPT="$TOPDIR/setup_${OS_TAG}.sh"
 
 cat > "$SETUP_SCRIPT" <<EOS
 #!/bin/bash
-export MYPROJ_ROOT="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")/$OS_TAG" && pwd)"
+if [ -n "\${ZSH_VERSION:-}" ]; then _SRC="\${(%):-%N}"; else _SRC="\${BASH_SOURCE[0]:-\$0}"; fi
+export MYPROJ_ROOT="\$(cd "\$(dirname "\$_SRC")/$OS_TAG" && pwd)"
 
 # Executables from the view
 export PATH="\$MYPROJ_ROOT/bin:\$PATH"
