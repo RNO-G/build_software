@@ -63,7 +63,7 @@ pip3 install gnureadline h5py healpy \
     iminuit tables tqdm matplotlib numpy pandas pynverse astropy \
     scipy uproot awkward libconf \
     tinydb tinydb-serialization aenum pymongo dash plotly \
-    toml peakutils configparser filelock
+    toml peakutils configparser filelock pre-commit
 
 # ==== STEP 6: Create Setup Script ====
 echo "[+] Creating setup script..."
