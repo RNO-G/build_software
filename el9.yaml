@@ -8,6 +8,7 @@ spack:
     - python@3.13.5 +ssl +shared +zlib +sqlite3 ^sqlite@3.50.4
     - py-pip
     - py-pybind11
+    - py-cython
     - xz@5.6.3
     - root@6.36.02 +python +gsl +tmva +roofit +http +ssl
     - librno-g@master
