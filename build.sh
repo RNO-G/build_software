@@ -103,6 +103,16 @@ done
 
 export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib:\$MYPROJ_ROOT/lib64\${LD_LIBRARY_PATH:+:\$LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH="\$MYPROJ_ROOT/lib/root:\$LD_LIBRARY_PATH"
+
+# control blas's enthusiasm
+# specifically important for numpy, which, when blas is enabled, 
+# will spin up threads for *all* cores on import
+export OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-1}
+export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}     # catches OpenMP builds
+export MKL_NUM_THREADS=${MKL_NUM_THREADS:-1}     # if anyone uses MKL
+export BLIS_NUM_THREADS=${BLIS_NUM_THREADS:-1}   # if BLIS shows up
+export VECLIB_MAXIMUM_THREADS=${VECLIB_MAXIMUM_THREADS:-1}  # Apple Accelerate
+export NUMEXPR_MAX_THREADS=${NUMEXPR_MAX_THREADS:-1}        # if numexpr is used
 EOS
 
 chmod +x "$SETUP_SCRIPT"
