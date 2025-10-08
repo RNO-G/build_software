@@ -33,15 +33,76 @@ fi
 source "$SPACK_DIR/share/spack/setup-env.sh"
 
 # ==== STEP 2: Upgrade GCC first ====
+# spack compiler add # find the compilers we have so far
+# echo "[+] Bootstrapping gcc@15.2.0..."
+# if ! spack compilers | grep -q gcc@15.2.0; then
+#     # install the compiler we want, and force rebuild binutils
+#     # along with telling it to ignore any fancy optimizations
+#     # that might not be available globally
+#     spack install --add -j "$NPROC" gcc@15.2.0 +binutils ^zlib-ng~opt
+#     spack compiler find $(spack location -i gcc@15.2.0)
+# fi
+
+# ==== STEP 2: Upgrade GCC first ====
+
 spack compiler add # find the compilers we have so far
-echo "[+] Bootstrapping gcc@15.2.0..."
-if ! spack compilers | grep -q gcc@15.2.0; then
-    # install the compiler we want, and force rebuild binutils
-    # along with telling it to ignore any fancy optimizations
-    # that might not be available globally
-    spack install --add -j "$NPROC" gcc@15.2.0 +binutils ^zlib-ng~opt
-    spack compiler find $(spack location -i gcc@15.2.0)
+
+TARGET_GCC="15.2.0"
+BOOTSTRAP_FLOOR="11.3.0"
+INTERMEDIATE_GCC="12.3.0"   # safe/easy intermediate
+NPROC="${NPROC:-4}"
+
+version_ge() {  # usage: version_ge A B  -> true if A >= B
+  [ "$(printf '%s\n' "$2" "$1" | sort -V | head -1)" = "$2" ]
+}
+
+# grab all registered gcc versions (just the numbers)
+mapfile -t GCC_VERS < <(spack compilers | awk '/^gcc@/ {sub("gcc@","",$1); print $1}' | sort -V)
+
+echo "[+] Registered GCCs: ${GCC_VERS[*]:-<none>}"
+
+BEST_GCC=""
+LOWEST_GCC=""
+if [ "${#GCC_VERS[@]}" -gt 0 ]; then
+  LOWEST_GCC="${GCC_VERS[0]}"
+  BEST_GCC="${GCC_VERS[-1]}"
 fi
+
+NEED_INTERMEDIATE=0
+if [ -z "$BEST_GCC" ] || ! version_ge "$BEST_GCC" "$BOOTSTRAP_FLOOR"; then
+  NEED_INTERMEDIATE=1
+fi
+
+if [ $NEED_INTERMEDIATE -eq 1 ]; then
+  # pick something to compile the intermediate with (fallback to system gcc)
+  BOOTSTRAP_FROM="${BEST_GCC:-${LOWEST_GCC:-system}}"
+  if [ "$BOOTSTRAP_FROM" = "system" ]; then
+    echo "[+] No GCC registered; will rely on system gcc (likely /usr/bin/gcc)."
+    FROM_SPEC=""   # Spack will use default (system) compiler registration
+  else
+    FROM_SPEC="%gcc@${BOOTSTRAP_FROM}"
+  fi
+
+  echo "[+] No compiler >= ${BOOTSTRAP_FLOOR}; building intermediate gcc@${INTERMEDIATE_GCC} ${FROM_SPEC} ..."
+  spack install -j "$NPROC" gcc@${INTERMEDIATE_GCC} ${FROM_SPEC}
+  spack compiler find "$(spack location -i gcc@${INTERMEDIATE_GCC})"
+
+  # update BEST_GCC to the new intermediate
+  BEST_GCC="${INTERMEDIATE_GCC}"
+else
+  echo "[+] Compiler floor met: best registered gcc@${BEST_GCC} >= ${BOOTSTRAP_FLOOR}."
+fi
+
+# If gcc@${TARGET_GCC} already registered as a compiler, we can skip the build
+if spack compilers | grep -q "gcc@${TARGET_GCC}\b"; then
+  echo "[+] gcc@${TARGET_GCC} already registered as a compiler; skipping build."
+else
+  echo "[+] Building gcc@${TARGET_GCC} with %gcc@${BEST_GCC} ..."
+  spack install --add -j "$NPROC" gcc@${TARGET_GCC} %gcc@${BEST_GCC} +binutils ^zlib-ng~opt
+  spack compiler find "$(spack location -i gcc@${TARGET_GCC})"
+fi
+echo "[+] Done. Available compilers now:"
+spack compilers
 
 # ==== STEP 3: Create Environment (with view), and activate ====
 echo "[+] Creating and activating Spack environment..."
