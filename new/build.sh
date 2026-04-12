@@ -143,10 +143,10 @@ echo "LD_LIBRARY_PATH after fix: $LD_LIBRARY_PATH"
 echo "PATH: $PATH"
 
 ${GIT_REPO_DIR}/builders/${VERSION}/build_libRootFftwWrapper.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
-# ${GIT_REPO_DIR}/builders/${VERSION}/build_librnog.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
-# ${GIT_REPO_DIR}/builders/${VERSION}/build_mattak.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
+${GIT_REPO_DIR}/builders/${VERSION}/build_librnog.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" || error 109 "Failed libRnog build"
+${GIT_REPO_DIR}/builders/${VERSION}/build_mattak.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 110 "Failed mattak build"
 
-# ==== STEP 6: Create Setup Script ====
+==== STEP 6: Create Setup Script ====
 
 cat > ${DESTDIR}/setup.sh << 'EOF'
 #!/bin/sh

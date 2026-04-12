@@ -11,20 +11,20 @@ fi
 VERSION="$1"
 OS="$2"
 IMAGE="./${OS}.sif"
-NPROC=4
+NPROC=3
 
 
 # the final real path where we want files to be installed
-# DESTDIR="/cvmfs/rnog.opensciencegrid.org/software"
-DESTDIR="/tmp/brianclark/rnog_cvmfs_demo/${VERSION}/${OS}"
-mkdir -p $DESTDIR
+DESTDIR="/cvmfs/rnog.opensciencegrid.org/software/${VERSION}/${OS}"
+# DESTDIR="/tmp/rnog_cvmfs_demo/software/${VERSION}/${OS}"
+# mkdir -p $DESTDIR
 
 # a scratch directory where spack can put intermediate build files
 SCRATCH_DIR="/tmp/rnog_scratch/${VERSION}/${OS}"
 mkdir -p $SCRATCH_DIR
 
 # the temporary spot where we are going to build and actually write files
-BUILD_DIR="/tmp/rnog_build/${VERSION}/${OS}"
+BUILD_DIR="/tmp/rnog_build/software/${VERSION}/${OS}"
 mkdir -p $BUILD_DIR
 
 BUILD_SCRIPT="./build.sh"
