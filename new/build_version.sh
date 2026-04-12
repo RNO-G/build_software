@@ -27,7 +27,7 @@ mkdir -p $SCRATCH_DIR
 BUILD_DIR="/tmp/rnog_build/software/${VERSION}/${OS}"
 mkdir -p $BUILD_DIR
 
-BUILD_SCRIPT="./build.sh"
+BUILD_SCRIPT="./builders/${VERSION}/build.sh"
 GIT_REPO_DIR="./"
 
 # in cvmfs, we bind BUILD_DIR to DESTDIR
