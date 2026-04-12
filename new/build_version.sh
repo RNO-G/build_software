@@ -11,7 +11,7 @@ fi
 VERSION="$1"
 OS="$2"
 IMAGE="./${OS}.sif"
-NPROC=40
+NPROC=4
 
 
 # the final real path where we want files to be installed
