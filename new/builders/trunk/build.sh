@@ -93,7 +93,7 @@ if ! spack compilers | grep -q gcc@15.2.0; then
     # along with telling it to ignore any fancy optimizations
     # that might not be available globally
     echo "[+] Bootstrapping gcc@15.2.0..."
-    spack install --add -j "$NPROC" "gcc@15.2.0 +binutils %gcc@${BOOTSTRAP_VERSION} ^zlib-ng~opt"
+    spack install --add -j "$NPROC" "gcc@15.2.0 +binutils target=x86_64_v2 %gcc@${BOOTSTRAP_VERSION} ^zlib-ng~opt"
     spack compiler find $(spack location -i gcc@15.2.0)
 fi
 spack compilers
@@ -146,7 +146,7 @@ ${GIT_REPO_DIR}/builders/${VERSION}/build_libRootFftwWrapper.sh --source "$SOURC
 ${GIT_REPO_DIR}/builders/${VERSION}/build_librnog.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" || error 109 "Failed libRnog build"
 ${GIT_REPO_DIR}/builders/${VERSION}/build_mattak.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 110 "Failed mattak build"
 
-==== STEP 6: Create Setup Script ====
+# ==== STEP 6: Create Setup Script ====
 
 cat > ${DESTDIR}/setup.sh << 'EOF'
 #!/bin/sh
