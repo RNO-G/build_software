@@ -1,6 +1,6 @@
 # /cvmfs/rnog.opensciencegrid.org/software/setup.sh
 # Meta-wrapper that detects OS and sources the correct per-OS setup.
-# Supported today: EL8, EL9. Easy to extend (Ubuntu/Debian/etc).
+# Supported today: EL8, EL9, Ubuntu 22.04. Easy to extend (Debian/etc).
 
 # ----- config -----
 _RNOG_PREFIX="/cvmfs/rnog.opensciencegrid.org/software/trunk"
@@ -84,11 +84,11 @@ __rn_main() {
     el8|el9)
       target="${_RNOG_PREFIX}/${platform}/setup.sh"
       ;;
-    # Uncomment/add mappings as you add support:
-    # ubuntu22) target="${_RNOG_PREFIX}/setup_ubuntu22.sh" ;;
-    # debian12) target="${_RNOG_PREFIX}/setup_debian12.sh" ;;
+    ubuntu22)
+      target="${_RNOG_PREFIX}/ubuntu2204/setup.sh"
+      ;;
     *)
-      __rn_die "Unsupported platform '${platform}'. Supported today: el8, el9."
+      __rn_die "Unsupported platform '${platform}'. Supported today: el8, el9, ubuntu2204."
       return 1
       ;;
   esac

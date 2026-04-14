@@ -123,7 +123,10 @@ if [ $SKIP_BUILD = false ]; then
 	export RNOG_DEPS_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
 	export LD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH"
 	export DYLD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH"
-	. "${ROOT_BUILD_DIR%/}"/bin/thisroot.sh || exit 21
+	ORIG_DIR="$(pwd)"
+	cd "${ROOT_BUILD_DIR%/}"
+	. bin/thisroot.sh || exit 21
+	cd "$ORIG_DIR"
 	export PATH="$RNOG_DEPS_INSTALL_DIR/bin:$PATH"
 
 	# mattak-specific environment variables

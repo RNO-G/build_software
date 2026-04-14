@@ -179,7 +179,7 @@ fi
 
 # Do stuff that would have been done in what thisroot.sh would add, but via the view)
 export ROOTSYS="$RNOG_DEPS_INSTALL_DIR"
-export PYTHONPATH="$RNOG_DEPS_INSTALL_DIR/lib/python$PYVER/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+# export PYTHONPATH="$RNOG_DEPS_INSTALL_DIR/lib/python$PYVER/site-packages${PYTHONPATH:+:$PYTHONPATH}"
 for d in "$RNOG_DEPS_INSTALL_DIR/lib/root" "$RNOG_DEPS_INSTALL_DIR/lib64/root"; do
   if [ -d "$d" ]; then
     case ":$PYTHONPATH:" in
