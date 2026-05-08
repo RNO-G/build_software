@@ -131,17 +131,19 @@ if [ $SKIP_BUILD = false ]; then
 
 	# mattak-specific environment variables
 	export RNO_G_INSTALL_DIR="$RNOG_UTIL_INSTALL_DIR"
-	export CMAKE_FLAGS="-DLIBRNO_G_SUPPORT=ON"
 
 	# Find pybind11 cmake directory
 	PYTHON_EXE=$(which python3)
 	PYVER=$($PYTHON_EXE -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 	PYBIND11_DIR="$RNOG_DEPS_INSTALL_DIR/lib/python${PYVER}/site-packages/pybind11/share/cmake/pybind11"
-	export CMAKE_ARGS="-Dpybind11_DIR=$PYBIND11_DIR"
 
 	# Set python site-packages directory
 	PYTHON_SITE_PACKAGES=$($PYTHON_EXE -c "import site; print(site.getsitepackages()[0])")
 	export PYTHON_SITE_PACKAGES
+
+	# Override the cmake executable to pass all necessary flags directly,
+	# since mattak's Makefile invokes $(CMAKE) ../ verbatim with no flag forwarding.
+	export CMAKE="cmake -Dpybind11_DIR=$PYBIND11_DIR -DLIBRNO_G_SUPPORT=ON"
 fi
 
 # Run package installation
