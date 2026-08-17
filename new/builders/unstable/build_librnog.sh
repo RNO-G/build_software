@@ -3,7 +3,7 @@
 
 # Set script parameters
 PACKAGE_NAME="librno-g"
-DOWNLOAD_LINK="https://github.com/RNO-G/librno-g/archive/master.tar.gz"
+DOWNLOAD_LINK="https://github.com/RNO-G/librno-g/archive/refs/heads/modify-data-format.tar.gz"
 PACKAGE_DIR_NAME="librno-g"
 
 usage() {

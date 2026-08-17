@@ -3,7 +3,7 @@
 
 # Set script parameters
 PACKAGE_NAME="mattak"
-DOWNLOAD_LINK="https://github.com/RNO-G/mattak/archive/main.tar.gz"
+DOWNLOAD_LINK="https://github.com/RNO-G/mattak/archive/refs/heads/modify-data-format.tar.gz"
 PACKAGE_DIR_NAME="mattak"
 
 usage() {
