@@ -3,7 +3,8 @@
 
 # Set script parameters
 PACKAGE_NAME="mattak"
-DOWNLOAD_LINK="https://github.com/RNO-G/mattak/archive/main.tar.gz"
+REPO_URL="https://github.com/RNO-G/mattak.git"
+BRANCH="main"
 PACKAGE_DIR_NAME="mattak"
 
 usage() {
@@ -106,15 +107,11 @@ if [ ! -d "$ROOT_BUILD_DIR" ]; then
 fi
 
 
-# Download and unzip the package
+# Clone the package (shallow, keeps .git so the commit hash is recorded)
 cd "$SOURCE_DIR"
 if [ $SKIP_DOWNLOAD = false ]; then
-	echo "Downloading $PACKAGE_NAME to $SOURCE_DIR"
-	wget "$DOWNLOAD_LINK" -O "$PACKAGE_DIR_NAME.tar.gz" || exit 11
-	echo "Extracting $PACKAGE_NAME"
-	mkdir "$PACKAGE_DIR_NAME"
-	tar -xzf "$PACKAGE_DIR_NAME.tar.gz" -C "$PACKAGE_DIR_NAME" --strip-components=1 || exit 12
-	rm "$PACKAGE_DIR_NAME.tar.gz"
+	echo "Cloning $PACKAGE_NAME to $SOURCE_DIR"
+	GIT_TERMINAL_PROMPT=0 git clone --depth 1 --branch "$BRANCH" "$REPO_URL" "$PACKAGE_DIR_NAME" || exit 11
 fi
 
 # Set required environment variables
