@@ -14,6 +14,10 @@ OS_TAG="$3"
 DESTDIR="$4"
 NPROC="$5"
 SPACK_VERSION="v1.1.1"
+# spack-packages tag; keep in sync with the repos: section of the yaml
+SPACK_PACKAGES_TAG="v2025.11.0"
+# compiler we bootstrap and build the stack with; keep in sync with the yaml
+GCC_VERSION="15.2.0"
 
 # ==== CONFIGURATION STUFF ====
 
@@ -49,6 +53,8 @@ echo "[+] Using MISC_DIR:          $MISC_DIR"
 echo "[+] Using RNOG_BUILD_DIR:     $RNOG_BUILD_DIR"
 echo "[+] Using SOURCE_DIR:        $SOURCE_DIR"
 echo "[+] Using SPACK_DIR:         $SPACK_DIR"
+echo "[+] Using SPACK_PACKAGES:    $SPACK_PACKAGES_TAG"
+echo "[+] Using GCC:               $GCC_VERSION"
 echo "[+] Using USER CONFIG:       $SPACK_USER_CONFIG"
 echo "[+] Using USER CACHE:        $SPACK_USER_CACHE"
 echo "[+] Using SPACK_TMPDIR:      $SPACK_TMPDIR"
@@ -80,21 +86,21 @@ mkdir -p "$SOURCE_DIR"
 mkdir -p "$RNOG_BUILD_DIR"
 mkdir -p "$MISC_DIR"
 source "$SPACK_DIR/share/spack/setup-env.sh"
-spack repo update builtin --tag v2025.11.0
+spack repo update builtin --tag "$SPACK_PACKAGES_TAG"
 
 # ==== STEP 2: Upgrade GCC ====
 spack compiler add # find the compilers we have so far
 spack compilers
 BOOTSTRAP_COMPILER=$(spack compilers | grep "gcc@" | head -1 | grep -o 'gcc@[0-9.]*')
 BOOTSTRAP_VERSION="${BOOTSTRAP_COMPILER#gcc@}"
-echo "[+] Will use $BOOTSTRAP_COMPILER to bootstrap gcc@15.2.0"
-if ! spack compilers | grep -q gcc@15.2.0; then
+echo "[+] Will use $BOOTSTRAP_COMPILER to bootstrap gcc@${GCC_VERSION}"
+if ! spack compilers | grep -q "gcc@${GCC_VERSION}"; then
     # install the compiler we want, and force rebuild binutils
     # along with telling it to ignore any fancy optimizations
     # that might not be available globally
-    echo "[+] Bootstrapping gcc@15.2.0..."
-    spack install --add -j "$NPROC" "gcc@15.2.0 +binutils target=x86_64_v2 %gcc@${BOOTSTRAP_VERSION} ^zlib-ng~opt"
-    spack compiler find $(spack location -i gcc@15.2.0)
+    echo "[+] Bootstrapping gcc@${GCC_VERSION}..."
+    spack install --add -j "$NPROC" "gcc@${GCC_VERSION} +binutils target=x86_64_v2 %gcc@${BOOTSTRAP_VERSION} ^zlib-ng~opt"
+    spack compiler find $(spack location -i "gcc@${GCC_VERSION}")
 fi
 spack compilers
 
