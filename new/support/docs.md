@@ -88,8 +88,36 @@ have is a complete, ready-to-go copy of the install tree sitting in
 
 Once the build finishes, you've got a finished file tree sitting in
 `/tmp/rnog_build/software/<version>/<os>`. It is *not* live yet — nobody
-pointed at `/cvmfs/rnog.opensciencegrid.org` can see it. To actually publish it,
-we first open a transaction:
+pointed at `/cvmfs/rnog.opensciencegrid.org` can see it.
+
+To push it out, run `deploy.sh` on the stratum zero machine:
+```
+bash deploy.sh trunk el9
+```
+That does the transaction, copy, and publish steps below for you,
+and if anything goes wrong partway through, it aborts the transaction.
+It doesn't touch the top level `software/<version>/setup.sh`, so move that by hand.
+
+### Rebuilding just librno-g and mattak
+
+Sometimes we only want to redo librno-g and mattak (say, someone pushed a fix
+to their branches), and not wait hours for the whole spack stack again. So:
+```
+bash build_version.sh unstable el9 --rnog-only
+bash deploy.sh unstable el9 --rnog-only
+```
+This only works if there's already a full build sitting in `/tmp`.
+librno-g and mattak get compiled against that build's spack stack,
+so `deploy.sh --rnog-only` checks that it's the same stack that's already in cvmfs
+(by comparing the `spack.lock` files), and refuses to deploy if not.
+Otherwise you'd end up with a mattak that was built against a different ROOT than the one in cvmfs.
+
+What gets wiped and rebuilt is in `builders/<version>/build_rnog.sh`.
+Note that mattak puts its python module in the view's `site-packages`, not in `rnog_build`.
+
+### What deploying does by hand
+
+The manual version goes like this. First we open a transaction:
 
 ```
 cvmfs_server transaction rnog.opensciencegrid.org

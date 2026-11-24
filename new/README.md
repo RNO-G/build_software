@@ -8,7 +8,12 @@ A much more detailed discussion of the builder is located in `support/docs.md`.
 bash build_version.sh trunk el9
 ```
 
-That would build the trunk version for el9.
+That would build the trunk version for el9, into `/tmp`. Then to push it to cvmfs
+(on the stratum zero machine):
+```
+bash deploy.sh trunk el9
+```
+If you only want to redo librno-g and mattak, add `--rnog-only` to both.
 
 It works by dropping you into a singularity/apptainer imagine.
 So it's going to look for `el9.sif`.

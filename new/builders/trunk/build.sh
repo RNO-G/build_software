@@ -1,10 +1,29 @@
 #!/bin/bash
 set -euo pipefail
 
+# Builds one version of the RNOG software for one OS. Gets called by build_version.sh, inside the container.
+# Roughly:
+#   1. clone spack (if we don't have it yet), source it, and pin the package recipes to a tag
+#   2. build our own gcc with whatever gcc the container has
+#   3. make the spack environment from the yaml (with the view in misc_build/), and activate it
+#   4. concretize + install the whole spack stack, then build healpix
+#   5. set up for building our own stuff: flags, and load the gcc ROOT was built with
+#   6. pip install the python packages, and build libRootFftwWrapper
+#   7. wipe + build librno-g and mattak (build_rnog.sh)
+#   8. write the setup.sh that users source
+#
+# With --rnog-only we skip building the stack and just redo librno-g and mattak (step 7).
+# But step 7 still needs the environment from steps 1, 3 and 5 (spack sourced, env activated,
+# flags + compiler loaded). Those lines are mixed in with the building, and can't just move
+# to the top (can't activate the env before it exists, or load ROOT's compiler before ROOT exists).
+# So instead of one big "if", RNOG_ONLY gets checked in a few places to skip only the parts
+# that build things, and the setup lines run either way. That way nothing gets copy-pasted.
+
 # ==== ARGUMENTS ====
-if [ $# -ne 5 ]; then
-    echo "Usage: $0 <git_repo_dir> <version> <os_tag> <topdir> <nproc>"
+if [ $# -ne 5 ] && ! { [ $# -eq 6 ] && [ "$6" = "--rnog-only" ]; }; then
+    echo "Usage: $0 <git_repo_dir> <version> <os_tag> <topdir> <nproc> [--rnog-only]"
     echo "Example: $0 /path/to/cvmfs_spack trunk el9 /cvmfs/rnog.opensciencegrid.org/trunk/el9 8"
+    echo "  --rnog-only  only rebuild librno-g and mattak, against an existing build"
     exit 1
 fi
 
@@ -13,6 +32,10 @@ VERSION="$2"
 OS_TAG="$3"
 DESTDIR="$4"
 NPROC="$5"
+RNOG_ONLY=false
+if [ $# -eq 6 ]; then
+    RNOG_ONLY=true
+fi
 SPACK_VERSION="v1.1.1"
 
 # ==== CONFIGURATION STUFF ====
@@ -53,6 +76,7 @@ echo "[+] Using USER CONFIG:       $SPACK_USER_CONFIG"
 echo "[+] Using USER CACHE:        $SPACK_USER_CACHE"
 echo "[+] Using SPACK_TMPDIR:      $SPACK_TMPDIR"
 echo "[+] Build with NPROC         $NPROC"
+echo "[+] RNO-G only:             $RNOG_ONLY"
 echo "=============================================="
 echo "=============================================="
 echo "=============================================="
@@ -61,7 +85,8 @@ echo
 echo
 
 # ==== STEP 1: Clone Spack if Needed ====
-if [ ! -d "$SPACK_DIR" ]; then
+# with --rnog-only we never clone, bootstrap gcc, or create the env, the stack should already be there
+if ! $RNOG_ONLY && [ ! -d "$SPACK_DIR" ]; then
     echo "[+] Cloning Spack into $SPACK_DIR..."
     mkdir -p "$(dirname "$SPACK_DIR")"
 	  git clone --depth=1 --branch "$SPACK_VERSION" https://github.com/spack/spack.git "$SPACK_DIR"
@@ -88,7 +113,7 @@ spack compilers
 BOOTSTRAP_COMPILER=$(spack compilers | grep "gcc@" | head -1 | grep -o 'gcc@[0-9.]*')
 BOOTSTRAP_VERSION="${BOOTSTRAP_COMPILER#gcc@}"
 echo "[+] Will use $BOOTSTRAP_COMPILER to bootstrap gcc@15.2.0"
-if ! spack compilers | grep -q gcc@15.2.0; then
+if ! $RNOG_ONLY && ! spack compilers | grep -q gcc@15.2.0; then
     # install the compiler we want, and force rebuild binutils
     # along with telling it to ignore any fancy optimizations
     # that might not be available globally
@@ -100,36 +125,30 @@ spack compilers
 
 # ==== STEP 3: Create Environment (with view), and activate ====
 echo "[+] Creating and activating Spack environment..."
-if [ ! -d "$SPACK_ROOT/var/spack/environments/$ENV_NAME" ]; then
+if ! $RNOG_ONLY && [ ! -d "$SPACK_ROOT/var/spack/environments/$ENV_NAME" ]; then
     spack env create "$ENV_NAME" "$YAML_SOURCE" --with-view "$MISC_DIR"
 fi
 spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Concretize and Install Full Stack ====
-echo "[+] Starting concretization..."
-spack concretize --fresh
-echo "[+] Concretization finished. Starting installation..."
-spack install -j "$NPROC"
+if ! $RNOG_ONLY; then
+    echo "[+] Starting concretization..."
+    spack concretize --fresh
+    echo "[+] Concretization finished. Starting installation..."
+    spack install -j "$NPROC"
 
-# build healpix now, before we pip install healpy (healpix will bring in libsharp)
-${GIT_REPO_DIR}/builders/${VERSION}/build_healpix.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 104 "Failed healpix build"
+    # build healpix now, before we pip install healpy (healpix will bring in libsharp)
+    ${GIT_REPO_DIR}/builders/${VERSION}/build_healpix.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 104 "Failed healpix build"
+fi
 
 
-# ==== STEP 5: Install Python Needs ====
+# ==== STEP 5: Set up for building our own stuff (pip packages, and the RNOG software) ====
 export PIP_CACHE_DIR=$SPACK_USER_CACHE_PATH # set pip cache (again, contain the blast radius...)
 # need these to make sure pip installs healpy correctly by building it against
 # our copy of cfitsio
 export LDFLAGS="-L$MISC_DIR/lib -Wl,-rpath,$MISC_DIR/lib"
 export CPPFLAGS="-I$MISC_DIR/include"
 export PKG_CONFIG_PATH="$MISC_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
-python3 -m pip install --upgrade pip
-pip3 install gnureadline healpy \
-    iminuit tqdm matplotlib numpy pandas pynverse astropy \
-    scipy uproot awkward libconf \
-    tinydb tinydb-serialization aenum pymongo dash plotly \
-    toml peakutils configparser filelock pre-commit
-
-# ==== STEP 6: Now we need some RNOG specific stuff ====
 
 ROOT_COMPILER=$(spack find --format '{compiler}' root | head -1)
 echo "ROOT was built with: $ROOT_COMPILER"
@@ -142,11 +161,23 @@ export LD_LIBRARY_PATH="$GCC_PREFIX/lib64:$GCC_PREFIX/lib:$LD_LIBRARY_PATH"
 echo "LD_LIBRARY_PATH after fix: $LD_LIBRARY_PATH"
 echo "PATH: $PATH"
 
-${GIT_REPO_DIR}/builders/${VERSION}/build_libRootFftwWrapper.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
-${GIT_REPO_DIR}/builders/${VERSION}/build_librnog.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" || error 109 "Failed libRnog build"
-${GIT_REPO_DIR}/builders/${VERSION}/build_mattak.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 110 "Failed mattak build"
+# ==== STEP 6: Python packages and libRootFftwWrapper ====
+if ! $RNOG_ONLY; then
+    python3 -m pip install --upgrade pip
+    pip3 install gnureadline healpy \
+        iminuit tqdm matplotlib numpy pandas pynverse astropy \
+        scipy uproot awkward libconf \
+        tinydb tinydb-serialization aenum pymongo dash plotly \
+        toml peakutils configparser filelock pre-commit
 
-# ==== STEP 6: Create Setup Script ====
+    ${GIT_REPO_DIR}/builders/${VERSION}/build_libRootFftwWrapper.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
+fi
+
+# ==== STEP 7: librno-g and mattak ====
+# (this is the only thing --rnog-only actually builds)
+${GIT_REPO_DIR}/builders/${VERSION}/build_rnog.sh "$SOURCE_DIR" "$RNOG_BUILD_DIR" "$MISC_DIR" "$NPROC" || error 109 "Failed RNO-G build"
+
+# ==== STEP 8: Create Setup Script ====
 
 cat > ${DESTDIR}/setup.sh << 'EOF'
 #!/bin/sh

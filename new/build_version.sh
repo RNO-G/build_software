@@ -2,14 +2,16 @@
 set -euo pipefail
 
 # ==== ARGUMENTS ====
-if [ $# -ne 2 ]; then
-    echo "Usage: $0 <version> <os>"
+if [ $# -ne 2 ] && ! { [ $# -eq 3 ] && [ "$3" = "--rnog-only" ]; }; then
+    echo "Usage: $0 <version> <os> [--rnog-only]"
     echo "Example: $0 trunk alma9"
+    echo "  --rnog-only  only rebuild librno-g and mattak, against an existing build"
     exit 1
 fi
 
 VERSION="$1"
 OS="$2"
+EXTRA_ARGS=("${@:3}") # empty, or --rnog-only
 IMAGE="./${OS}.sif"
 NPROC=3
 
@@ -44,4 +46,4 @@ apptainer exec -c \
     -B "$SCRATCH_DIR":/var \
     -B "$PWD":"$PWD" \
     "$IMAGE" \
-    "$BUILD_SCRIPT" "$GIT_REPO_DIR" "$VERSION" "$OS" "$DESTDIR" "$NPROC"
+    "$BUILD_SCRIPT" "$GIT_REPO_DIR" "$VERSION" "$OS" "$DESTDIR" "$NPROC" "${EXTRA_ARGS[@]}"
