@@ -7,11 +7,10 @@ spack:
     - sqlite@3.53.1
     - boost@1.90.0
     - cfitsio@4.6.3 cflags="-std=gnu99 -D_GNU_SOURCE"
-    - python@3.15.1 +ssl +shared +zlib +sqlite3 ^sqlite@3.53.1
+    - python@3.14.9 +ssl +shared +zlib +sqlite3 ^sqlite@3.53.1
     - py-pip@26.2.2
     - py-pybind11@3.0.4
-    # NB: no py-cython here; spack's py-cython recipe caps python@:3.14,
-    # so cython is pip-installed in build.sh instead
+    - py-cython@3.2.4
     - xz@5.8.3
     - root@6.40.04 +python +gsl +tmva +roofit +http +ssl +spectrum
     - ncurses@6.6~termlib

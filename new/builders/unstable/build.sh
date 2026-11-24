@@ -129,9 +129,7 @@ export LDFLAGS="-L$MISC_DIR/lib -Wl,-rpath,$MISC_DIR/lib"
 export CPPFLAGS="-I$MISC_DIR/include"
 export PKG_CONFIG_PATH="$MISC_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
 # pip itself is pinned via py-pip in the yaml, so no "pip install --upgrade pip" here
-# cython is pip-installed (not spack) because spack's py-cython caps python@:3.14
 pip3 install \
-    cython==3.3.1 \
     gnureadline==8.3.3 \
     healpy==1.20.1 \
     iminuit==2.33.0 \
