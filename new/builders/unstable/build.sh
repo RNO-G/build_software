@@ -13,11 +13,11 @@ VERSION="$2"
 OS_TAG="$3"
 DESTDIR="$4"
 NPROC="$5"
-SPACK_VERSION="v1.1.1"
+SPACK_VERSION="v1.2.2"
 # spack-packages tag; keep in sync with the repos: section of the yaml
-SPACK_PACKAGES_TAG="v2025.11.0"
+SPACK_PACKAGES_TAG="v2026.10.1"
 # compiler we bootstrap and build the stack with; keep in sync with the yaml
-GCC_VERSION="15.2.0"
+GCC_VERSION="16.2.0"
 
 # ==== CONFIGURATION STUFF ====
 
@@ -113,7 +113,7 @@ spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Concretize and Install Full Stack ====
 echo "[+] Starting concretization..."
-spack concretize --fresh --reuse
+spack concretize --fresh
 echo "[+] Concretization finished. Starting installation..."
 spack install -j "$NPROC"
 
@@ -128,12 +128,36 @@ export PIP_CACHE_DIR=$SPACK_USER_CACHE_PATH # set pip cache (again, contain the 
 export LDFLAGS="-L$MISC_DIR/lib -Wl,-rpath,$MISC_DIR/lib"
 export CPPFLAGS="-I$MISC_DIR/include"
 export PKG_CONFIG_PATH="$MISC_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
-python3 -m pip install --upgrade pip
-pip3 install gnureadline healpy \
-    iminuit tqdm matplotlib numpy pandas pynverse astropy \
-    scipy uproot awkward libconf \
-    tinydb tinydb-serialization aenum pymongo dash plotly \
-    toml peakutils configparser filelock pre-commit
+# pip itself is pinned via py-pip in the yaml, so no "pip install --upgrade pip" here
+# cython is pip-installed (not spack) because spack's py-cython caps python@:3.14
+pip3 install \
+    cython==3.3.1 \
+    gnureadline==8.3.3 \
+    healpy==1.20.1 \
+    iminuit==2.33.0 \
+    tqdm==4.70.1 \
+    matplotlib==3.11.2 \
+    numpy==2.5.5 \
+    pandas==3.1.1 \
+    pynverse==0.1.4.6 \
+    astropy==8.0.3 \
+    scipy==1.18.1 \
+    uproot==5.7.8 \
+    awkward==2.15.1 \
+    libconf==2.0.1 \
+    tinydb==4.9.0 \
+    tinydb-serialization==2.2.0 \
+    aenum==3.1.17 \
+    pymongo==4.20.1 \
+    dash==4.5.1 \
+    plotly==7.1.0 \
+    toml==0.10.2 \
+    peakutils==1.3.5 \
+    configparser==7.3.0 \
+    filelock==4.3.1 \
+    pre-commit==4.7.0
+# record exactly what pip ended up with (incl. transitive deps)
+pip3 freeze > "${DESTDIR}/pip_freeze.txt"
 
 # ==== STEP 6: Now we need some RNOG specific stuff ====
 

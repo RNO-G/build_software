@@ -107,7 +107,7 @@ spack env activate "$ENV_NAME"
 
 # ==== STEP 4: Concretize and Install Full Stack ====
 echo "[+] Starting concretization..."
-spack concretize --fresh --reuse
+spack concretize --fresh
 echo "[+] Concretization finished. Starting installation..."
 spack install -j "$NPROC"
 
