@@ -1,3 +1,13 @@
+# ===== cvmfs_spack project-specific =====
+# apptainer/singularity images (hundreds of MB each; rebuild from new/support/*.cfg)
+*.sif
+*.img
+
+# local editor / Claude Code settings
+.vscode/
+.claude/settings.local.json
+
+# ===== generic Python / OS template below =====
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
