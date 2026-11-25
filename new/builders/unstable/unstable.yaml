@@ -12,7 +12,7 @@ spack:
     - py-pybind11@3.0.4
     - py-cython@3.2.4
     - xz@5.8.3
-    - root@6.40.04 +python +gsl +tmva +roofit +http +ssl +spectrum
+    - root@6.40.04 +python +gsl +tmva +roofit +ssl +spectrum +x +davix +tbb
     - ncurses@6.6~termlib
   concretizer:
     unify: true
@@ -28,5 +28,11 @@ spack:
   packages:
     all:
       target: [x86_64_v2]
-      prefer:
-        - "gcc@16.2.0"
+    # prefer our gcc for anything that needs a compiler. this is how the spack docs say to do it.
+    # (putting it under all: instead makes spack quietly turn off root features and pick old versions)
+    c:
+      prefer: ["gcc@16.2.0"]
+    cxx:
+      prefer: ["gcc@16.2.0"]
+    fortran:
+      prefer: ["gcc@16.2.0"]
