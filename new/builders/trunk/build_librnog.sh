@@ -122,8 +122,8 @@ if [ $SKIP_BUILD = false ]; then
 	echo "Compiling $PACKAGE_NAME"
 	cd "$PACKAGE_DIR_NAME"
 
-	make
-	make install PREFIX="${BUILD_DIR%/}"
+	make || exit 1
+	make install PREFIX="${BUILD_DIR%/}" || exit 1
 fi
 
 # Clean up source directory if requested
