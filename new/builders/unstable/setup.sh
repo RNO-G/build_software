@@ -101,9 +101,9 @@ __rn_main() {
   # Optional: show which file we’re sourcing (handy for debugging)
   __rn_info "Detected ${platform}; sourcing $(basename "$target")"
   # shellcheck disable=SC1090
-  source "$target"
+  source "$target" "$@"
 }
 
-__rn_main || { $__rn_source_mode || exit 1; }
+__rn_main "$@" || { $__rn_source_mode || exit 1; }
 unset -f __rn_main __rn_detect_platform __rn_die __rn_info
 unset _RNOG_PREFIX _OS_OVERRIDE __rn_source_mode
