@@ -20,6 +20,12 @@ set -euo pipefail
 # that build things, and the setup lines run either way. That way nothing gets copy-pasted.
 
 # ==== ARGUMENTS ====
+# for all the "|| error <code> <message>" calls below: print the message and quit with that code
+error() {
+    echo "[!] $2" >&2
+    exit "$1"
+}
+
 if [ $# -ne 5 ] && ! { [ $# -eq 6 ] && [ "$6" = "--rnog-only" ]; }; then
     echo "Usage: $0 <git_repo_dir> <version> <os_tag> <topdir> <nproc> [--rnog-only]"
     echo "Example: $0 /path/to/cvmfs_spack trunk el9 /cvmfs/rnog.opensciencegrid.org/trunk/el9 8"

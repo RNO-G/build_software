@@ -5,7 +5,7 @@ set -euo pipefail
 # Has to be run on the stratum zero machine.
 #
 #   deploy.sh <version> <os>              cvmfs becomes an exact copy of the /tmp build
-#   deploy.sh <version> <os> --rnog-only  only copy over librno-g and mattak
+#   deploy.sh <version> <os> --rnog-only  only copy over librno-g, mattak, and NuRadioMC
 #                                         (after a build_version.sh <version> <os> --rnog-only)
 #
 # This doesn't touch the top level software/<version>/setup.sh, move that by hand.
@@ -32,18 +32,20 @@ if [ ! -d "$BUILD_DIR/misc_build" ]; then
 fi
 
 if $RNOG_ONLY; then
-    # librno-g and mattak got compiled against the spack stack in /tmp,
+    # the RNO-G packages got built against the spack stack in /tmp,
     # so make sure that's the same stack that's already in cvmfs.
     # spack.lock is spack's record of exactly what it built, so just compare those.
     lock_sums() { (cd "$1" && find .spack_internals -path '*/environments/*/spack.lock' | sort | xargs -r md5sum); }
     TMP_LOCKS="$(lock_sums "$BUILD_DIR")"
     if [ -z "$TMP_LOCKS" ] || [ ! -d "$DESTDIR" ] || [ "$TMP_LOCKS" != "$(lock_sums "$DESTDIR")" ]; then
-        echo "[!] The spack stack in $BUILD_DIR isn't the one in $DESTDIR, so librno-g and mattak won't match it."
+        echo "[!] The spack stack in $BUILD_DIR isn't the one in $DESTDIR, so the RNO-G packages won't match it."
         echo "    Not deploying. Do a full build + deploy instead."
         exit 1
     fi
     # same list of things that builders/<version>/build_rnog.sh wipes
     SYNC_PATHS=("rnog_build" "source/librno-g" "source/mattak")
+    # only unstable has NuRadioMC so far
+    [ -d "$BUILD_DIR/source/NuRadioMC" ] && SYNC_PATHS+=("source/NuRadioMC")
     for d in "$BUILD_DIR"/misc_build/lib/python3.*/site-packages/mattak; do
         [ -d "$d" ] && SYNC_PATHS+=("${d#"$BUILD_DIR"/}")
     done

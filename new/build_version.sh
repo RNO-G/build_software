@@ -5,7 +5,7 @@ set -euo pipefail
 if [ $# -ne 2 ] && ! { [ $# -eq 3 ] && [ "$3" = "--rnog-only" ]; }; then
     echo "Usage: $0 <version> <os> [--rnog-only]"
     echo "Example: $0 trunk alma9"
-    echo "  --rnog-only  only rebuild librno-g and mattak, against an existing build"
+    echo "  --rnog-only  only rebuild the RNO-G packages (see builders/<version>/build_rnog.sh)"
     exit 1
 fi
 

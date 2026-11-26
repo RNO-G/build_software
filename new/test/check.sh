@@ -12,7 +12,7 @@ if [ $# -ne 1 ]; then
     exit 1
 fi
 SETUP="$1"
-source "$SETUP" || exit 1
+source "$SETUP" --nuradio || exit 1
 
 FAILS=0
 check() {
@@ -33,6 +33,12 @@ check "python packages import"          'python3 -c "import numpy, scipy, matplo
 check "librno-g is there"               '[ -f "$RNOG_UTIL_INSTALL_DIR/lib/librno-g.so" ]'
 check "mattak lib is there"             '[ -f "$RNOG_UTIL_INSTALL_DIR/lib/libmattak.so" ]'
 check "import mattak works"             'python3 -c "import mattak.Dataset"'
+check "proposal can make a muon"        'python3 -c "import proposal; proposal.particle.MuMinusDef()"'
+check "import NuRadioMC works"          'python3 -c "import NuRadioMC, NuRadioReco, radiotools, pygdsm"'
+check "NuRadioMC c++ ray tracer built"   'python3 -c "from NuRadioMC.SignalProp.AnalyticRayTracingImpl.CPPAnalyticRayTracing import wrapper"'
+check "RNO-G vpol antenna model is there" 'python3 -c "import os, NuRadioReco.detector.antennapattern as a; n = \"RNOG_vpol_4inch_center_n1.73\"; assert os.path.exists(os.path.join(a.path_to_antennamodels, n, n + \".pkl\"))"'
+check "shower library and cross sections are there" 'python3 -c "import os, NuRadioMC; d = os.path.dirname(NuRadioMC.__file__); assert os.path.exists(d + \"/SignalGen/ARZ/shower_library/library_v1.2.pkl\") and os.path.exists(d + \"/utilities/data/BGR18_dsigma_dy_H2O.npz\")"'
+check "PROPOSAL Greenland tables are there" 'python3 -c "import glob, os, NuRadioMC; assert glob.glob(os.path.dirname(NuRadioMC.__file__) + \"/EvtGen/proposal_tables/Greenland/*.dat\")"'
 check "no missing libraries"            'out=$(ldd "$RNOG_UTIL_INSTALL_DIR"/lib/*.so "$RNOG_DEPS_INSTALL_DIR"/bin/root.exe) && ! grep -q "not found" <<< "$out"'
 
 # the el9 GLIBC thing (see README.md): nothing should need GLIBC_2.35 or newer,

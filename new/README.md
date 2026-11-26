@@ -15,7 +15,7 @@ Then to push it to cvmfs
 ```
 bash deploy.sh trunk el9
 ```
-If you only want to redo librno-g and mattak, add `--rnog-only` to the build and deploy commands.
+If you only want to redo the RNO-G packages (librno-g, mattak, and in unstable NuRadioMC), add `--rnog-only` to the build and deploy commands.
 
 It works by dropping you into a singularity/apptainer image.
 So it's going to look for `el9.sif`.
@@ -230,9 +230,9 @@ A couple of things worth knowing before you do this for real:
 - Publishing regenerates the whole catalog, so it's not instant. Don't panic
   if it takes a minute.
 
-## Rebuilding just librno-g and mattak
+## Rebuilding just the RNO-G packages
 
-Sometimes we only want to redo librno-g and mattak (say, someone pushed a fix
+Sometimes we only want to redo librno-g, mattak, and NuRadioMC (say, someone pushed a fix
 to their branches), and not wait hours for the whole spack stack again. So:
 ```
 bash build_version.sh unstable el9 --rnog-only

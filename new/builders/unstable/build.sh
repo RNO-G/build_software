@@ -9,10 +9,10 @@ set -euo pipefail
 #   4. concretize + install the whole spack stack, then build healpix
 #   5. set up for building our own stuff: flags, and load the gcc ROOT was built with
 #   6. pip install the python packages, and build libRootFftwWrapper and PROPOSAL
-#   7. wipe + build librno-g and mattak (build_rnog.sh)
+#   7. wipe + build librno-g, mattak, and NuRadioMC (build_rnog.sh)
 #   8. write the setup.sh that users source
 #
-# With --rnog-only we skip building the stack and just redo librno-g and mattak (step 7).
+# With --rnog-only we skip building the stack and just redo librno-g, mattak, and NuRadioMC (step 7).
 # But step 7 still needs the environment from steps 1, 3 and 5 (spack sourced, env activated,
 # flags + compiler loaded). Those lines are mixed in with the building, and can't just move
 # to the top (can't activate the env before it exists, or load ROOT's compiler before ROOT exists).
@@ -20,10 +20,16 @@ set -euo pipefail
 # that build things, and the setup lines run either way. That way nothing gets copy-pasted.
 
 # ==== ARGUMENTS ====
+# for all the "|| error <code> <message>" calls below: print the message and quit with that code
+error() {
+    echo "[!] $2" >&2
+    exit "$1"
+}
+
 if [ $# -ne 5 ] && ! { [ $# -eq 6 ] && [ "$6" = "--rnog-only" ]; }; then
     echo "Usage: $0 <git_repo_dir> <version> <os_tag> <topdir> <nproc> [--rnog-only]"
     echo "Example: $0 /path/to/cvmfs_spack trunk el9 /cvmfs/rnog.opensciencegrid.org/trunk/el9 8"
-    echo "  --rnog-only  only rebuild librno-g and mattak, against an existing build"
+    echo "  --rnog-only  only rebuild librno-g, mattak, and NuRadioMC, against an existing build"
     exit 1
 fi
 
@@ -208,7 +214,7 @@ if ! $RNOG_ONLY; then
     ${GIT_REPO_DIR}/builders/${VERSION}/build_proposal.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 110 "Failed PROPOSAL build"
 fi
 
-# ==== STEP 7: librno-g and mattak ====
+# ==== STEP 7: librno-g, mattak, and NuRadioMC ====
 # (this is the only thing --rnog-only actually builds)
 ${GIT_REPO_DIR}/builders/${VERSION}/build_rnog.sh "$SOURCE_DIR" "$RNOG_BUILD_DIR" "$MISC_DIR" "$NPROC" || error 109 "Failed RNO-G build"
 
