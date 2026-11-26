@@ -148,8 +148,8 @@ if [ $SKIP_BUILD = false ]; then
 	echo "Compiling $PACKAGE_NAME"
 	cd "$PACKAGE_DIR_NAME"
 
-	make "$MAKE_ARG"
-	make install "$MAKE_ARG"
+	make "$MAKE_ARG" || exit 1
+	make install "$MAKE_ARG" || exit 1
 fi
 
 # Clean up source directory if requested
