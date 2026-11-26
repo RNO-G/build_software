@@ -120,19 +120,20 @@ fi
 
 # Set required environment variables
 if [ $SKIP_BUILD = false ]; then
-	export ARA_UTIL_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
-	export ARA_DEPS_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
-	export LD_LIBRARY_PATH="$ARA_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH"
-	export DYLD_LIBRARY_PATH="$ARA_DEPS_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH"
+	# libRootFftwWrapper's cmake looks at RNO_G_INSTALL_DIR to decide where to install
+	export RNO_G_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
+	export RNOG_DEPS_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
+	export LD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH"
+	export DYLD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH"
 	ORIG_DIR="$(pwd)"
 	cd "${ROOT_BUILD_DIR%/}"
 	. bin/thisroot.sh || exit 21
 	cd "$ORIG_DIR"
-	export PATH="$ARA_DEPS_INSTALL_DIR/bin:$PATH" # export *after* thisroot.sh
-	export SQLITE_ROOT="$ARA_DEPS_INSTALL_DIR"
-	export GSL_ROOT="$ARA_DEPS_INSTALL_DIR"
-	export FFTWSYS="$ARA_DEPS_INSTALL_DIR"
-	export CMAKE_PREFIX_PATH="$ARA_DEPS_INSTALL_DIR"
+	export PATH="$RNOG_DEPS_INSTALL_DIR/bin:$PATH" # export *after* thisroot.sh
+	export SQLITE_ROOT="$RNOG_DEPS_INSTALL_DIR"
+	export GSL_ROOT="$RNOG_DEPS_INSTALL_DIR"
+	export FFTWSYS="$RNOG_DEPS_INSTALL_DIR"
+	export CMAKE_PREFIX_PATH="$RNOG_DEPS_INSTALL_DIR"
 fi
 # Run package installation
 if [ $SKIP_BUILD = false ]; then

@@ -123,14 +123,12 @@ fi
 
 # Set required environment variables
 if [ $SKIP_BUILD = false ]; then
-	export ARA_UTIL_INSTALL_DIR="${BUILD_DIR%/}"
-	export ARA_DEPS_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
-	export ARA_ROOT_DIR="${SOURCE_DIR%/}/$PACKAGE_DIR_NAME"
-	export LD_LIBRARY_PATH="$ARA_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH"
-	export DYLD_LIBRARY_PATH="$ARA_DEPS_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH"
+	export RNOG_DEPS_INSTALL_DIR="${DEPS_BUILD_DIR%/}"
+	export LD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$LD_LIBRARY_PATH"
+	export DYLD_LIBRARY_PATH="$RNOG_DEPS_INSTALL_DIR/lib:$DYLD_LIBRARY_PATH"
 	# . "${ROOT_BUILD_DIR%/}"/bin/thisroot.sh || exit 21
-	export PATH="$ARA_DEPS_INSTALL_DIR/bin:$PATH"
-	export PKG_CONFIG_PATH="$ARA_DEPS_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
+	export PATH="$RNOG_DEPS_INSTALL_DIR/bin:$PATH"
+	export PKG_CONFIG_PATH="$RNOG_DEPS_INSTALL_DIR/lib/pkgconfig:$PKG_CONFIG_PATH"
 fi
 
 # Run package installation
@@ -144,7 +142,7 @@ if [ $SKIP_BUILD = false ]; then
 	autoreconf -i --force || exit 22
 	
 	echo "Configuring libsharp..."
-	./configure --prefix="$ARA_DEPS_INSTALL_DIR" \
+	./configure --prefix="$RNOG_DEPS_INSTALL_DIR" \
 		CFLAGS="-fPIC -O3" || exit 23
 	
 	echo "Compiling libsharp..."
@@ -163,9 +161,9 @@ if [ $SKIP_BUILD = false ]; then
 
 	# Configure with cfitsio and libsharp from dependencies
 	echo "Configuring $PACKAGE_NAME..."
-	./configure --prefix="$ARA_DEPS_INSTALL_DIR" \
-		LDFLAGS="-L$ARA_DEPS_INSTALL_DIR/lib" \
-		CPPFLAGS="-I$ARA_DEPS_INSTALL_DIR/include" \
+	./configure --prefix="$RNOG_DEPS_INSTALL_DIR" \
+		LDFLAGS="-L$RNOG_DEPS_INSTALL_DIR/lib" \
+		CPPFLAGS="-I$RNOG_DEPS_INSTALL_DIR/include" \
 		CXXFLAGS="-fPIC -O3" \
 		CFLAGS="-fPIC -O3" || exit 27
 
@@ -185,4 +183,4 @@ if [ $CLEAN_SOURCE = true ]; then
 	rm -rf "$PACKAGE_DIR_NAME"
 fi
 
-echo "$PACKAGE_NAME installed in $ARA_DEPS_INSTALL_DIR"
+echo "$PACKAGE_NAME installed in $RNOG_DEPS_INSTALL_DIR"
