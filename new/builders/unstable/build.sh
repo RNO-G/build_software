@@ -8,7 +8,7 @@ set -euo pipefail
 #   3. make the spack environment from the yaml (with the view in misc_build/), and activate it
 #   4. concretize + install the whole spack stack, then build healpix
 #   5. set up for building our own stuff: flags, and load the gcc ROOT was built with
-#   6. pip install the python packages, and build libRootFftwWrapper
+#   6. pip install the python packages, and build libRootFftwWrapper and PROPOSAL
 #   7. wipe + build librno-g and mattak (build_rnog.sh)
 #   8. write the setup.sh that users source
 #
@@ -167,7 +167,7 @@ export LD_LIBRARY_PATH="$GCC_PREFIX/lib64:$GCC_PREFIX/lib:$LD_LIBRARY_PATH"
 echo "LD_LIBRARY_PATH after fix: $LD_LIBRARY_PATH"
 echo "PATH: $PATH"
 
-# ==== STEP 6: Python packages and libRootFftwWrapper ====
+# ==== STEP 6: Python packages, libRootFftwWrapper, and PROPOSAL ====
 if ! $RNOG_ONLY; then
     # pip is pinned in the yaml, so don't upgrade it here
     pip3 install \
@@ -194,11 +194,18 @@ if ! $RNOG_ONLY; then
         peakutils==1.3.5 \
         configparser==7.3.0 \
         filelock==4.3.1 \
-        pre-commit==4.7.0
+        pre-commit==4.7.0 \
+        numba==0.68.1 \
+        h5py==3.16.0 \
+        pyyaml==6.0.4 \
+        requests==2.34.2 \
+        future==1.0.0
     # save what pip actually installed, so we know later
     pip3 freeze > "${DESTDIR}/pip_freeze.txt"
 
     ${GIT_REPO_DIR}/builders/${VERSION}/build_libRootFftwWrapper.sh --source "$SOURCE_DIR" --build "$RNOG_BUILD_DIR" --root "$MISC_DIR" --deps "$MISC_DIR" $MAKE_ARGS || error 108 "Failed libRootFftwWrapper build"
+
+    ${GIT_REPO_DIR}/builders/${VERSION}/build_proposal.sh "$SOURCE_DIR" "$MISC_DIR" "$NPROC" || error 110 "Failed PROPOSAL build"
 fi
 
 # ==== STEP 7: librno-g and mattak ====

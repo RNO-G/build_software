@@ -6,7 +6,7 @@ spack:
     - fftw@3.3.11
     - gsl@2.8
     - sqlite@3.53.1
-    - boost@1.90.0
+    - boost@1.90.0 +filesystem +serialization
     - cfitsio@4.6.3 cflags="-std=gnu99 -D_GNU_SOURCE"
     - python@3.14.9 +ssl +shared +zlib +sqlite3 ^sqlite@3.53.1
     - py-pip@26.2.2
@@ -15,6 +15,11 @@ spack:
     - xz@5.8.3
     - root@6.40.04 +python +gsl +tmva +roofit +ssl +spectrum +x +davix +tbb
     - ncurses@6.6~termlib
+    # for PROPOSAL (see build_proposal.sh), along with boost's filesystem + serialization above.
+    # cubic_interpolation's own recipe asks for eigen 3.3, so stick with the newest 3.x, not eigen 5
+    - spdlog@1.17.0
+    - nlohmann-json@3.12.0
+    - eigen@3.4.1
   concretizer:
     unify: true
   config:
