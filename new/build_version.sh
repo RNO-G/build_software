@@ -13,7 +13,7 @@ VERSION="$1"
 OS="$2"
 EXTRA_ARGS=("${@:3}") # empty, or --rnog-only
 IMAGE="./${OS}.sif"
-NPROC=3
+NPROC=4
 
 
 # the final real path where we want files to be installed
