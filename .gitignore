@@ -3,6 +3,10 @@
 *.sif
 *.img
 
+# ===== Other stuff =====
+.subversion/
+.wget-hsts
+
 # local editor / Claude Code settings
 .vscode/
 .claude/settings.local.json
