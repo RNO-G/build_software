@@ -236,6 +236,17 @@ else
     echo "Warning: Could not find Python site-packages directory in ${RNOG_DEPS_INSTALL_DIR}/lib" >&2
 fi
 
+# our NuRadioMC (and radiotools, proposal) only goes on the path if you ask for it,
+# with "source setup.sh --nuradio". That way people can use their own NuRadioMC in a venv.
+if [ "${1:-}" = "--nuradio" ]; then
+    RNOG_SITE_PACKAGES=$(find "${RNOG_UTIL_INSTALL_DIR}/lib" -maxdepth 1 -type d -name 'python3.*' -print -quit 2>/dev/null)
+    if [ -n "$RNOG_SITE_PACKAGES" ] && [ -d "${RNOG_SITE_PACKAGES}/site-packages" ]; then
+        export PYTHONPATH="${RNOG_SITE_PACKAGES}/site-packages${PYTHONPATH:+:$PYTHONPATH}"
+    else
+        echo "Warning: --nuradio given, but there's no NuRadioMC in ${RNOG_UTIL_INSTALL_DIR}/lib" >&2
+    fi
+fi
+
 # Do stuff that would have been done in what thisroot.sh would add, but via the view)
 export ROOTSYS="$RNOG_DEPS_INSTALL_DIR"
 # export PYTHONPATH="$RNOG_DEPS_INSTALL_DIR/lib/python$PYVER/site-packages${PYTHONPATH:+:$PYTHONPATH}"
